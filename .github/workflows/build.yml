@@ -1,4 +1,4 @@
-name: Build CPython Windows
+name: Build IRRpython Windows
 
 on:
   push:
@@ -15,14 +15,15 @@ jobs:
     - name: Build CPython
       run: |
         cd PCbuild
-        ./build.bat -e -d
+        ./build.bat -e -r
       shell: cmd
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: python-windows-build
+        name: IRRpython-windows
         path: |
-          PCbuild/amd64/*.exe
-          PCbuild/amd64/*.dll
+          PCbuild/amd64/python.exe
+          PCbuild/amd64/python3*.dll
+          PCbuild/amd64/vcruntime*.dll
           PCbuild/amd64/*.pyd
