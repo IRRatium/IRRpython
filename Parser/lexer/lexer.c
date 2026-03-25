@@ -795,13 +795,21 @@ tok_get_normal_mode(struct tok_state *tok, tokenizer_mode* current_tok, struct t
         p_start = tok->start;
         p_end = tok->cur;
 
-        /* IRRpython: only enforce if IRRPYTHON=1 is set */
         if (getenv("IRRPYTHON") != NULL) {
-            if ((p_end - p_start) < 3 || strncmp(p_start, "IRR", 3) != 0) {
-                return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok,
-                    "all identifiers must start with 'IRR'"));
+            /* Пропускаем стандартную библиотеку */
+            const char *filename = tok->filename ? tok->filename : "";
+            int is_stdlib = (strstr(filename, "\\Lib\\") != NULL || 
+                             strstr(filename, "/Lib/") != NULL ||
+                             strstr(filename, "<frozen") != NULL ||
+                             strstr(filename, "<string") != NULL);
+            
+            if (!is_stdlib) {
+                if ((p_end - p_start) < 3 || strncmp(p_start, "IRR", 3) != 0) {
+                    return MAKE_TOKEN(_PyTokenizer_syntaxerror(tok,
+                        "all identifiers must start with 'IRR'"));
+                }
+                p_start += 3;
             }
-            p_start += 3;
         }
 
         return MAKE_TOKEN(NAME);
